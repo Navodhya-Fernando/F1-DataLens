@@ -30,10 +30,8 @@ _Published as part of the Cloud Computing Module at Advanced Diploma in Data Sci
 ---
 
 ## Live Demo
-- **S3 website endpoint** (static frontend): _your-public-s3-website-url_
-- **API Gateway** (backend Lambda endpoint): _your-api-gw-url_/top-tracks (example path)
-
-> Replace the placeholders above after you deploy.
+- **S3 website endpoint** (static frontend): http://f1-data-labs.s3-website.ap-south-1.amazonaws.com/
+- **API Gateway** (backend Lambda endpoint): http://f1-data-labs.s3-website.ap-south-1.amazonaws.com/{proxy+}
 
 ---
 
@@ -194,4 +192,4 @@ const API_KEY = 'YOUR_RAPIDAPI_KEY'; // if you call RapidAPI directly (NOT recom
 ---
 
 ## License
-MIT © 2025 Your Name
+MIT © 2025 Navodhya Fernando | Sndrea Raj | Hashini Handapangoda
