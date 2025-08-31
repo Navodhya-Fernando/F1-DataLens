@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 DataLens: Analytical Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --f1-dark: #0f0f13;
+            --f1-darker: #08080c;
+            --f1-light: #2a2a35;
+            --f1-blue: #0072b1;
+            --f1-text: #e0e0e0;
+            --f1-text-muted: #a0a0a0;
+            --bg-color: #08080c;
+            --card-bg: #0f0f13;
+            --text-color: #e0e0e0;
+            --border-color: #2a2a35;
+        }
+
+        .light-mode {
+            --f1-red: #e10600;
+            --f1-dark: #f8f9fa;
+            --f1-darker: #e9ecef;
+            --f1-light: #dee2e6;
+            --f1-blue: #0072b1;
+            --f1-text: #212529;
+            --f1-text-muted: #6c757d;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+            font-weight: 400;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+        }
+        
+        .navbar {
+            background-color: var(--card-bg) !important;
+            border-bottom: 3px solid var(--f1-red);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            color: var(--text-color) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            margin: 0 0.2rem;
+            border-radius: 0.25rem;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--f1-red);
+            transform: translateY(-2px);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--f1-light) 100%);
+            color: var(--text-color);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+        }
+        
+        .table {
+            color: var(--text-color);
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+        
+        .table-dark {
+            --bs-table-bg: var(--f1-light);
+            --bs-table-striped-bg: var(--card-bg);
+            --bs-table-hover-bg: var(--f1-red);
+            border-color: var(--border-color);
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(225, 6, 0, 0.2) !important;
+            color: var(--text-color);
+        }
+        
+        .season-selector {
+            max-width: 200px;
+            background-color: var(--f1-light);
+            border: 1px solid var(--f1-red);
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+        
+        .season-selector:focus {
+            background-color: var(--f1-light);
+            border-color: var(--f1-red);
+            color: var(--text-color);
+            box-shadow: 0 0 0 0.2rem rgba(225, 6, 0, 0.25);
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--f1-light) 100%);
+        }
+        
+        .stats-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--f1-red);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stats-card .text-muted {
+            color: var(--f1-text-muted) !important;
+            font-size: 0.85rem;
+        }
+        
+        .circuit-map {
+            height: 200px;
+            background: linear-gradient(135deg, var(--f1-light) 0%, var(--card-bg) 100%);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--f1-text-muted);
+            font-style: italic;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .circuit-map img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.7rem;
+            font-weight: 500;
+        }
+        
+        .form-select {
+            background-color: var(--f1-light);
+            border: 1px solid var(--f1-red);
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+        
+        .spinner-border {
+            color: var(--f1-red);
+        }
+        
+        .text-muted {
+            color: var(--f1-text-muted) !important;
+        }
+        
+        .alert {
+            background-color: var(--f1-light);
+            border: 1px solid var(--f1-red);
+            color: var(--text-color);
+        }
+        
+        .driver-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+        
+        .driver-card:hover {
+            border-color: var(--f1-red);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(225, 6, 0, 0.2);
+        }
+        
+        .driver-image {
+            height: 120px;
+            object-fit: contain;
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .team-logo {
+            height: 30px;
+            object-fit: contain;
+            margin-right: 10px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .driver-number {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--f1-red);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .race-type-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .compare-driver-btn {
+            transition: all 0.3s ease;
+            border: 1px solid var(--f1-red) !important;
+            color: var(--f1-red) !important;
+            background: transparent !important;
+            padding: 0.25rem 0.75rem !important;
+            font-size: 0.8rem !important;
+            font-weight: 500;
+        }
+        
+        .compare-driver-btn:hover {
+            background-color: var(--f1-red) !important;
+            color: white !important;
+            transform: scale(1.05);
+        }
+        
+        .comparison-table th {
+            background-color: var(--f1-light);
+            color: var(--f1-red);
+            font-weight: 600;
+        }
+        
+        .driver-nationality {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+        
+        .radar-chart-container {
+            height: 400px;
+            margin: 20px 0;
+        }
+        
+        .settings-menu {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            width: 250px;
+        }
+        
+        .settings-menu.show {
+            display: block;
+        }
+        
+        .footer {
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            margin-top: 40px;
+            font-size: 0.85rem;
+        }
+        
+        .footer a {
+            color: var(--f1-text);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-left: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            color: var(--f1-red);
+            transform: rotate(45deg);
+        }
+        
+        .race-info-card {
+            min-height: 180px;
+        }
+        
+        .university-logo {
+            height: 40px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .team-member {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .linkedin-icon {
+            color: var(--f1-blue);
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        
+        .tab-icon {
+            margin-right: 6px;
+            width: 18px;
+            text-align: center;
+        }
+        
+        .container {
+            padding-bottom: 20px;
+        }
+        
+        .driver-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            border: 2px solid var(--f1-red);
+        }
+        
+        .team-logo-small {
+            height: 24px;
+            width: 24px;
+            object-fit: contain;
+            margin-right: 8px;
+        }
+        
+        .standing-driver {
+            display: flex;
+            align-items: center;
+        }
+        
+        .standing-team {
+            display: flex;
+            align-items: center;
+        }
+
+        .comparison-bars {
+            display: grid;
+            gap: 14px;
+        }
+
+        .stat-card {
+            background: var(--card-bg, #101114);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: 180px minmax(180px, 1fr) 64px;
+            gap: 12px;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .stat-label { color: #aab3c0; }
+        .stat-value { text-align: right; color: #e8edf3; }
+
+        .progress {
+            background: rgba(255,255,255,0.08);
+            height: 10px;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #e10600 0%, #ff5a52 100%);
+            width: 0%;
+            transition: width .35s ease;
+        }
+        .driver-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #e8edf3;
+        }
+
+        .standings-row {
+            display: flex;
+            gap: 20px;  
+        }
+
+        .standings-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-speedometer me-2"></i>
+                <strong>F1 DataLens</strong>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-tab="overview">
+                            <span class="tab-icon"><i class="fas fa-home"></i></span> Overview
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="season">
+                            <span class="tab-icon"><i class="fas fa-calendar-alt"></i></span> Season Analysis
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="drivers">
+                            <span class="tab-icon"><i class="fas fa-user"></i></span> Driver Comparison
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="circuits">
+                            <span class="tab-icon"><i class="fas fa-route"></i></span> Circuit Profiler
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <select id="seasonSelector" class="form-select season-selector me-3">
+                        <option>Loading seasons...</option>
+                    </select>
+                    <div class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Settings Menu -->
+    <div class="settings-menu" id="settingsMenu">
+        <h6 class="mb-3"><i class="fas fa-cog me-2"></i>Settings</h6>
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="darkModeToggle" checked>
+            <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Data Refresh Rate</label>
+            <select class="form-select" id="refreshRate">
+                <option value="5">5 minutes</option>
+                <option value="10" selected>10 minutes</option>
+                <option value="30">30 minutes</option>
+                <option value="60">1 hour</option>
+            </select>
+        </div>
+        <hr>
+        <div class="text-center">
+            <small class="text-muted">F1 DataLens v1.2</small>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Overview Tab -->
+        <div id="overviewTab" class="tab-content active">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <div class="stats-number" id="totalRaces">-</div>
+                        <div class="text-muted">Total Races</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <div class="stats-number" id="totalDrivers">-</div>
+                        <div class="text-muted">Drivers</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <div class="stats-number" id="totalTeams">-</div>
+                        <div class="text-muted">Teams</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <div class="stats-number" id="totalPoints">-</div>
+                        <div class="text-muted">Points Awarded</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="standings-row">
+                <div class="standings-card">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Driver Standings</span>
+                            <span class="badge bg-danger" id="driverStandingsTitle">2022</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover" id="driverStandingsTable">
+                                    <thead>
+                                        <tr><th>Pos</th><th>Driver</th><th>Points</th><th>Wins</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="4" class="text-center">Loading driver standings...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="standings-card">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Constructor Standings</span>
+                            <span class="badge bg-danger" id="constructorStandingsTitle">2022</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover" id="constructorStandingsTable">
+                                    <thead>
+                                        <tr><th>Pos</th><th>Team</th><th>Points</th><th>Wins</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="4" class="text-center">Loading team standings...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card race-info-card">
+                        <div class="card-header">Last Race</div>
+                        <div class="card-body" id="lastRaceCard">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-danger" role="status"></div>
+                                <p class="mt-2 mb-0">Loading last race info...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card race-info-card">
+                        <div class="card-header">Next Race</div>
+                        <div class="card-body" id="nextRaceCard">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-danger" role="status"></div>
+                                <p class="mt-2 mb-0">Loading next race info...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Season Analysis Tab -->
+        <div id="seasonTab" class="tab-content">
+            <h3 class="mb-4">Season Analysis - <span class="text-danger" id="seasonAnalysisTitle">2022</span></h3>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">Race Calendar</div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover" id="raceCalendarTable">
+                                    <thead><tr><th>Race</th><th>Circuit</th><th>Date</th><th>Type</th><th>Status</th></tr></thead>
+                                    <tbody><tr><td colspan="6" class="text-center">Loading race calendar...</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">Season Statistics</div>
+                        <div class="card-body" id="seasonStats">
+                            <div class="text-center py-4"><div class="spinner-border text-danger"></div><p class="mt-2 mb-0">Loading statistics...</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Driver Comparison Tab -->
+        <div id="driversTab" class="tab-content">
+            <h3 class="mb-4">Driver Comparison - <span class="text-danger" id="driversSeasonTitle">2022</span></h3>
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">Select Drivers to Compare</div>
+                        <div class="card-body">
+                            <div class="row" id="driversList">
+                                <div class="col-md-12 text-center py-4">
+                                    <div class="spinner-border text-danger"></div>
+                                    <p class="mt-2 mb-0">Loading drivers...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">Comparison Results</div>
+                        <div class="card-body" id="comparisonResults">
+                            <div class="text-center py-5 text-muted">
+                                <i class="fas fa-users fa-3x mb-3"></i>
+                                <p>Select drivers from above to compare their statistics</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Circuit Profiler Tab -->
+        <div id="circuitsTab" class="tab-content">
+            <h3 class="mb-4">Circuit Profiler - <span class="text-danger" id="circuitsSeasonTitle">2022</span></h3>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">F1 Circuits</div>
+                        <div class="card-body">
+                            <div class="row" id="circuitsList">
+                                <div class="col-md-12 text-center py-4">
+                                    <div class="spinner-border text-danger"></div>
+                                    <p class="mt-2 mb-0">Loading circuits...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-2">
+                        <i class="fas fa-university me-2 linkedin-icon"></i>
+                        <span>National Innovation Centre - NIBM | Coventry University</span>
+                    </div>
+                    <p class="mb-0">Advanced Formula 1 Analytics Dashboard</p>
+                </div>
+                <div class="col-md-6 mt-3 mt-md-0">
+                    <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center">
+                        <div class="team-member me-md-3">
+                            <i class="fab fa-linkedin linkedin-icon"></i>
+                            <a href="https://www.linkedin.com/in/navodhya-fernando-" target="_blank">Navodhya Fernando</a>
+                        </div>
+                        <div class="team-member me-md-3">
+                            <i class="fab fa-linkedin linkedin-icon"></i>
+                            <a href="https://www.linkedin.com/in/sandrea-raj-a32552329" target="_blank">Sandrea Raj</a>
+                        </div>
+                        <div class="team-member">
+                            <i class="fab fa-linkedin linkedin-icon"></i>
+                            <a href="https://www.linkedin.com/in/hashini-handapangoda-135290294" target="_blank">Hashini Handapangoda</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-center">
+                    <p class="text-muted mb-0">© 2025 F1 DataLens. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'https://v1.formula-1.api-sports.io';
+        const API_KEY = '6f8a87b310cb1bd62e29cfd92b333a2f';
+        
+        let currentSeason = new Date().getFullYear();
+        let allSeasons = [];
+        let currentTab = 'overview';
+        let allDrivers = [];
+        let allTeams = [];
+        let allCircuits = [];
+        let comparedDrivers = [];
+        let radarChart = null;
+
+        // Team logos mapping
+        const teamLogos = {
+            'mercedes': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Mercedes_AMG_Petronas_F1_Logo.svg/800px-Mercedes_AMG_Petronas_F1_Logo.svg.png',
+            'red bull': 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/Red_Bull_Racing_logo.svg/800px-Red_Bull_Racing_logo.svg.png',
+            'mclaren': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/McLaren_Racing_logo.svg/800px-McLaren_Racing_logo.svg.png',
+            'ferrari': 'https://upload.wikimedia.org/wikipedia/en/thumb/d/d1/Scuderia_Ferrari_Logo.svg/800px-Scuderia_Ferrari_Logo.svg.png',
+            'alpine': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Alpine_F1_Team_Logo.svg/800px-Alpine_F1_Team_Logo.svg.png',
+            'alpha tauri': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Scuderia_AlphaTauri_logo.svg/800px-Scuderia_AlphaTauri_logo.svg.png',
+            'aston martin': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Aston_Martin_Cognizant_F1_Team_logo.svg/800px-Aston_Martin_Cognizant_F1_Team_logo.svg.png',
+            'williams': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Williams_Racing_Logo.svg/800px-Williams_Racing_Logo.svg.png',
+            'alfa romeo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Alfa_Romeo_Racing_Logo.svg/800px-Alfa_Romeo_Racing_Logo.svg.png',
+            'haas': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Haas_F1_Team_logo.svg/800px-Haas_F1_Team_logo.svg.png'
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupTabHandling();
+            setupSettingsToggle();
+            setupThemeToggle();
+        });
+
+        function setupSettingsToggle() {
+            const themeToggle = document.getElementById('themeToggle');
+            const settingsMenu = document.getElementById('settingsMenu');
+            
+            themeToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                settingsMenu.classList.toggle('show');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!themeToggle.contains(e.target) && !settingsMenu.contains(e.target)) {
+                    settingsMenu.classList.remove('show');
+                }
+            });
+        }
+
+        function setupThemeToggle() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            
+            // Check for saved theme preference or respect OS preference
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
+                document.body.classList.add('light-mode');
+                darkModeToggle.checked = false;
+            } else {
+                document.body.classList.remove('light-mode');
+                darkModeToggle.checked = true;
+            }
+            
+            darkModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.remove('light-mode');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.classList.add('light-mode');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        }
+
+        function setupTabHandling() {
+            document.querySelectorAll('.nav-link').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-link').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            currentTab = tabName;
+            loadTabData(tabName);
+        }
+
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'overview':
+                    loadOverviewData(currentSeason);
+                    break;
+                case 'season':
+                    loadSeasonAnalysis(currentSeason);
+                    break;
+                case 'drivers':
+                    loadDriverComparison(currentSeason);
+                    break;
+                case 'circuits':
+                    loadCircuitProfiler(currentSeason);
+                    break;
+            }
+        }
+
+        async function initializeApp() {
+            await loadSeasons();
+            await loadOverviewData(currentSeason);
+        }
+
+        async function loadSeasons() {
+            try {
+                const data = await fetchAPI('/seasons');
+                const availableSeasons = data.response || [];
+                
+                // Get all seasons and sort them in descending order
+                allSeasons = availableSeasons.sort((a, b) => b - a);
+                
+                const seasonSelector = document.getElementById('seasonSelector');
+                seasonSelector.innerHTML = '';
+                
+                allSeasons.forEach(season => {
+                    const option = document.createElement('option');
+                    option.value = season;
+                    option.textContent = season;
+                    option.selected = (season === currentSeason);
+                    seasonSelector.appendChild(option);
+                });
+                
+                seasonSelector.addEventListener('change', function() {
+                    currentSeason = parseInt(this.value);
+                    loadTabData(currentTab);
+                });
+                
+            } catch (error) {
+                console.error('Error loading seasons:', error);
+                // Fallback to a range of seasons if API fails
+                const currentYear = new Date().getFullYear();
+                allSeasons = Array.from({length: currentYear - 1950 + 1}, (_, i) => currentYear - i);
+                
+                const seasonSelector = document.getElementById('seasonSelector');
+                seasonSelector.innerHTML = '';
+                
+                allSeasons.forEach(season => {
+                    const option = document.createElement('option');
+                    option.value = season;
+                    option.textContent = season;
+                    option.selected = (season === currentSeason);
+                    seasonSelector.appendChild(option);
+                });
+            }
+        }
+
+        async function loadOverviewData(season) {
+            try {
+                showLoading('driverStandingsTable', 'Loading driver standings...');
+                showLoading('constructorStandingsTable', 'Loading team standings...');
+                showLoading('lastRaceCard', 'Loading last race...');
+                showLoading('nextRaceCard', 'Loading next race...');
+                
+                document.getElementById('driverStandingsTitle').textContent = season;
+                document.getElementById('constructorStandingsTitle').textContent = season;
+                
+                const [driversData, teamsData, racesData] = await Promise.allSettled([
+                    fetchAPI(`/rankings/drivers?season=${season}`),
+                    fetchAPI(`/rankings/teams?season=${season}`),
+                    fetchAPI(`/races?season=${season}`)
+                ]);
+                
+                if (driversData.status === 'fulfilled') {
+                    const drivers = driversData.value.response || [];
+                    updateDriverStandings(drivers);
+                } else {
+                    showError('driverStandingsTable', 'Failed to load driver data');
+                }
+                
+                if (teamsData.status === 'fulfilled') {
+                    const teams = teamsData.value.response || [];
+                    updateConstructorStandings(teams);
+                } else {
+                    showError('constructorStandingsTable', 'Failed to load team data');
+                }
+                
+                if (racesData.status === 'fulfilled') {
+                    const races = racesData.value.response || [];
+                    processRacesData(races, season);
+                } else {
+                    showError('lastRaceCard', 'Failed to load race data');
+                    showError('nextRaceCard', 'Failed to load race data');
+                }
+                
+                updateStats(
+                    driversData.status === 'fulfilled' ? (driversData.value.response || []) : [],
+                    teamsData.status === 'fulfilled' ? (teamsData.value.response || []) : [],
+                    racesData.status === 'fulfilled' ? (racesData.value.response || []) : []
+                );
+                
+            } catch (error) {
+                console.error('Error loading overview data:', error);
+                showError('driverStandingsTable', 'Failed to load data');
+            }
+        }
+
+        async function loadSeasonAnalysis(season) {
+            try {
+                showLoading('raceCalendarTable', 'Loading race calendar...');
+                showLoading('seasonStats', 'Loading season statistics...');
+                
+                document.getElementById('seasonAnalysisTitle').textContent = season;
+                
+                const racesData = await fetchAPI(`/races?season=${season}`);
+                const races = racesData.response || [];
+                
+                updateRaceCalendar(races);
+                updateSeasonStats(races);
+                
+            } catch (error) {
+                console.error('Error loading season analysis:', error);
+                showError('raceCalendarTable', 'Failed to load race data');
+            }
+        }
+
+        async function loadDriverComparison(season) {
+            try {
+                showLoading('driversList', 'Loading drivers...');
+                document.getElementById('driversSeasonTitle').textContent = season;
+                
+                // Get driver standings for the selected season
+                const standingsData = await fetchAPI(`/rankings/drivers?season=${season}`);
+                const standings = standingsData.response || [];
+                
+                // Extract driver IDs from standings
+                const driverIds = standings.map(standing => standing.driver?.id).filter(id => id);
+                
+                if (driverIds.length === 0) {
+                    showError('driversList', 'No drivers found for this season');
+                    return;
+                }
+                
+                // Get detailed info for each driver
+                const driversPromises = driverIds.map(id => fetchAPI(`/drivers?id=${id}`));
+                const driversResults = await Promise.allSettled(driversPromises);
+                
+                // Extract driver data from responses
+                const seasonDrivers = driversResults
+                    .filter(result => result.status === 'fulfilled' && result.value.response && result.value.response.length > 0)
+                    .map(result => result.value.response[0]);
+                
+                updateDriversList(seasonDrivers, season);
+                
+            } catch (error) {
+                console.error('Error loading drivers:', error);
+                showError('driversList', 'Failed to load drivers');
+            }
+        }
+
+        async function loadCircuitProfiler(season) {
+            try {
+                showLoading('circuitsList', 'Loading circuits...');
+                document.getElementById('circuitsSeasonTitle').textContent = season;
+                
+                // Get all circuits and filter by those used in this season
+                const [allCircuitsData, racesData] = await Promise.all([
+                    fetchAPI('/circuits'),
+                    fetchAPI(`/races?season=${season}`)
+                ]);
+                
+                allCircuits = allCircuitsData.response || [];
+                const races = racesData.response || [];
+                
+                // Get unique circuit IDs from this season's races
+                const seasonCircuitIds = [...new Set(races.map(race => race.circuit && race.circuit.id).filter(id => id))];
+                
+                // Filter circuits to only include those used in this season
+                const seasonCircuits = allCircuits.filter(circuit => 
+                    seasonCircuitIds.includes(circuit.id)
+                );
+                
+                updateCircuitsList(seasonCircuits);
+                
+            } catch (error) {
+                console.error('Error loading circuits:', error);
+                showError('circuitsList', 'Failed to load circuits');
+            }
+        }
+
+        async function fetchAPI(endpoint) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const response = await fetch(url, {
+                headers: {
+                    'x-rapidapi-host': 'v1.formula-1.api-sports.io',
+                    'x-rapidapi-key': API_KEY
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ${endpoint}: ${response.status}`);
+            }
+            
+            return await response.json();
+        }
+
+        const driverSeasonCache = new Map();
+
+        async function getDriverSeasonStats(season, driverId) {
+            const key = `${season}-${driverId}`;
+            if (driverSeasonCache.has(key)) return driverSeasonCache.get(key);
+
+            // 1) base driver standings for points & wins (and driver info)
+            const base = await fetchAPI(`/rankings/drivers?season=${season}&driver=${driverId}`);
+            const baseItem = (base.response || [])[0] || {};
+            const out = {
+                driver: baseItem.driver || { name: 'Unknown Driver' },
+                points: Number(baseItem.points || 0),
+                wins: Number(baseItem.wins || 0),
+                podiums: 0,
+                pole_positions: 0,
+                fastest_laps: 0
+            };
+
+            // 2) podiums from race rankings
+            try {
+                const rr = await fetchAPI(`/rankings/races?season=${season}&driver=${driverId}`);
+                const races = rr.response || [];
+                out.podiums = races.filter(r =>
+                (r.type || '').toLowerCase().includes('race') &&
+                Number(r.position || 99) <= 3
+                ).length;
+            } catch (e) { /* keep 0 */ }
+
+            // 3) poles from starting grid
+            try {
+                const sg = await fetchAPI(`/rankings/startinggrid?season=${season}&driver=${driverId}`);
+                const starts = sg.response || [];
+                out.pole_positions = starts.filter(s => Number(s.position || 99) === 1).length;
+            } catch (e) { /* keep 0 */ }
+
+            // 4) fastest laps
+            try {
+                const fl = await fetchAPI(`/rankings/fastestlaps?season=${season}&driver=${driverId}`);
+                out.fastest_laps = (fl.response || []).length;
+            } catch (e) { /* keep 0 */ }
+
+            driverSeasonCache.set(key, out);
+            return out;
+            }
+
+        function updateDriverStandings(drivers) {
+            const tbody = document.querySelector('#driverStandingsTable tbody');
+            if (!tbody) return;
+            
+            if (!drivers || drivers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No driver data available</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            drivers.slice(0, 10).forEach((driver, index) => {
+                const row = document.createElement('tr');
+                
+                // Get team name for logo
+                const teamName = driver.team ? driver.team.name.toLowerCase() : '';
+                const teamLogo = teamLogos[teamName] || '';
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                        <td><strong>${driver.driver?.name || 'Unknown Driver'}</strong></td>
+                        <td>${Number(driver.points || 0)}</td>
+                        <td>${Number(driver.wins || 0)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateConstructorStandings(teams) {
+            const tbody = document.querySelector('#constructorStandingsTable tbody');
+            if (!tbody) return;
+            
+            if (!teams || teams.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No team data available</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            teams.slice(0, 10).forEach((team, index) => {
+                const row = document.createElement('tr');
+                
+                // Get team name for logo
+                const teamName = team.team ? team.team.name.toLowerCase() : '';
+                const teamLogo = teamLogos[teamName] || '';
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                        <td> <strong>${team.team.name || 'Unknown Team'}</strong>
+                        </td>
+                        <td>${team.points || 0}</td>
+                        <td><span class="badge bg-success">${team.wins || 0}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateRaceCard(cardId, race, title) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            
+            if (!race) {
+                card.innerHTML = `<p class="text-center">No ${title.toLowerCase()} data available</p>`;
+                return;
+            }
+            
+            const date = new Date(race.date).toLocaleDateString();
+            card.innerHTML = `
+                <h6>${race.competition ? race.competition.name : race.name || 'Unknown Race'}</h6>
+                <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i> ${race.circuit ? race.circuit.name : 'Unknown Circuit'}</p>
+                <p class="mb-1"><i class="fas fa-calendar me-2"></i> ${date}</p>
+                <p class="mb-0"><span class="badge ${getRaceTypeBadgeClass(race.type)}">${race.type || 'Unknown Type'}</span></p>
+            `;
+        }
+
+        function getRaceTypeBadgeClass(type) {
+            if (!type) return 'bg-secondary';
+            
+            if (type.toLowerCase().includes('qualifying')) return 'bg-info';
+            if (type.toLowerCase().includes('practice')) return 'bg-warning';
+            if (type.toLowerCase().includes('sprint')) return 'bg-primary';
+            if (type.toLowerCase().includes('race')) return 'bg-danger';
+            
+            return 'bg-secondary';
+        }
+
+        function processRacesData(races, season) {
+            if (!races || races.length === 0) {
+                showError('lastRaceCard', `No race data for ${season}`);
+                showError('nextRaceCard', `No race data for ${season}`);
+                return;
+            }
+            
+            const sortedRaces = races.filter(race => race.date).sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            const now = new Date();
+            const completedRaces = sortedRaces.filter(race => new Date(race.date) < now);
+            const lastRace = completedRaces.length > 0 ? completedRaces[completedRaces.length - 1] : null;
+            
+            const upcomingRaces = sortedRaces.filter(race => new Date(race.date) >= now);
+            const nextRace = upcomingRaces.length > 0 ? upcomingRaces[0] : null;
+            
+            updateRaceCard('lastRaceCard', lastRace, 'Last Race');
+            updateRaceCard('nextRaceCard', nextRace, 'Next Race');
+        }
+
+        function updateStats(drivers, teams, races) {
+            const totalRaces = document.getElementById('totalRaces');
+            const totalDrivers = document.getElementById('totalDrivers');
+            const totalTeams = document.getElementById('totalTeams');
+            const totalPoints = document.getElementById('totalPoints');
+            
+            const cleanDrivers = Array.isArray(drivers) ? drivers : [];
+            const cleanTeams = Array.isArray(teams) ? teams : [];
+            const cleanRaces = Array.isArray(races) ? races : [];
+            
+            if (totalRaces) totalRaces.textContent = cleanRaces.length || '0';
+            if (totalDrivers) totalDrivers.textContent = cleanDrivers.length || '0';
+            if (totalTeams) totalTeams.textContent = cleanTeams.length || '0';
+            
+            if (totalPoints) {
+                const totalPointsValue = cleanDrivers.reduce((sum, driver) => {
+                    let points = driver.points || 0;
+                    if (typeof points === 'string') points = parseFloat(points) || 0;
+                    return sum + points;
+                }, 0);
+                
+                totalPoints.textContent = totalPointsValue % 1 === 0 
+                    ? totalPointsValue.toLocaleString() 
+                    : totalPointsValue.toFixed(1).toLocaleString();
+            }
+        }
+
+        function updateRaceCalendar(races) {
+            const tbody = document.querySelector('#raceCalendarTable tbody');
+            if (!tbody) return;
+            
+            if (!races || races.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No race data available</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            races.forEach(race => {
+                const date = new Date(race.date).toLocaleDateString();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${race.competition ? race.competition.name : race.name || 'Unknown'}</strong></td>
+                    <td>${race.circuit ? race.circuit.name : 'Unknown'}</td>
+                    <td>${date}</td>
+                    <td><span class="badge ${getRaceTypeBadgeClass(race.type)}">${race.type || 'Unknown'}</span></td>
+                    <td><span class="badge ${new Date(race.date) < new Date() ? 'bg-success' : 'bg-warning'}">${new Date(race.date) < new Date() ? 'Completed' : 'Upcoming'}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateSeasonStats(races) {
+            const seasonStats = document.getElementById('seasonStats');
+            if (!seasonStats) return;
+            
+            const completedRaces = races.filter(race => new Date(race.date) < new Date()).length;
+            const totalRaces = races.length;
+            
+            seasonStats.innerHTML = `
+                <div class="text-center">
+                    <div class="stats-number">${completedRaces}/${totalRaces}</div>
+                    <div class="text-muted">Races Completed</div>
+                </div>
+            `;
+        }
+
+        function updateDriversList(drivers, season) {
+            const driversList = document.getElementById('driversList');
+            if (!driversList) return;
+            
+            if (!drivers || drivers.length === 0) {
+                driversList.innerHTML = '<div class="col-12 text-center">No drivers found for this season</div>';
+                return;
+            }
+            
+            driversList.innerHTML = '';
+            drivers.slice(0, 12).forEach(driver => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 mb-3';
+                
+                const driverImage = driver.image ? 
+                    `<img src="${driver.image}" alt="${driver.name}" class="driver-image" style="height: 120px; object-fit: cover;">` :
+                    `<div class="driver-image d-flex align-items-center justify-content-center" style="height: 120px;">
+                        <i class="fas fa-user fa-3x text-muted"></i>
+                     </div>`;
+                
+                col.innerHTML = `
+                    <div class="card driver-card text-center p-3 position-relative" data-driver-id="${driver.id}" style="cursor: pointer;">
+                        ${driver.number ? `<div class="driver-number">${driver.number}</div>` : ''}
+                        ${driverImage}
+                        <h5 class="mt-2 mb-1">${driver.name}</h5>
+                        <small class="text-muted driver-nationality">${driver.nationality || ''}</small>
+                        <div class="mt-2">
+                            <button class="btn btn-sm btn-outline-danger compare-driver-btn" style="border-radius: 20px;">
+                                <i class="fas fa-plus me-1"></i> Compare
+                            </button>
+                        </div>
+                    </div>
+                `;
+                driversList.appendChild(col);
+            });
+            
+            // Add event listeners to compare buttons
+            document.querySelectorAll('.compare-driver-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const driverCard = this.closest('.driver-card');
+                    const driverId = driverCard.getAttribute('data-driver-id');
+                    addDriverToComparison(driverId, season);
+                });
+            });
+            
+            // Also allow clicking on the card to compare
+            document.querySelectorAll('.driver-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (!e.target.closest('.compare-driver-btn')) {
+                        const driverId = this.getAttribute('data-driver-id');
+                        addDriverToComparison(driverId, season);
+                    }
+                });
+            });
+        }
+
+        function addDriverToComparison(driverId, season) {
+            // Convert to string for consistent comparison
+            driverId = driverId.toString();
+            
+            // Prevent adding the same driver twice
+            if (comparedDrivers.includes(driverId)) {
+                alert('This driver is already in the comparison');
+                return;
+            }
+            
+            // Limit comparison to 2 drivers
+            if (comparedDrivers.length >= 2) {
+                alert('You can only compare 2 drivers at a time');
+                return;
+            }
+            
+            comparedDrivers.push(driverId);
+            updateComparisonResults(season);
+        }
+
+        async function updateComparisonResults(season) {
+            const wrap = document.getElementById('comparisonResults');
+
+            if (!comparedDrivers || comparedDrivers.length === 0) {
+                wrap.innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-users fa-3x mb-3"></i>
+                    <p>Select drivers from above to compare their statistics</p>
+                </div>`;
+                return;
+            }
+
+            wrap.innerHTML = `
+                <div class="text-center py-4">
+                <div class="spinner-border text-danger"></div>
+                <p class="mt-2 mb-0">Loading comparison data...</p>
+                </div>`;
+
+            try {
+                // 1) fetch stats for selected drivers
+                const stats = await Promise.all(
+                comparedDrivers.map(id => getDriverSeasonStats(season, id))
+                );
+
+                // 2) pick the metrics we’ll show. Points & podiums are reliable.
+                const metrics = [
+                { key: 'points',        label: 'Points',        reliable: true  },
+                { key: 'wins',          label: 'Wins',          reliable: true  },
+                ];
+
+                // Compute max per metric (for progress normalization)
+                const maxByKey = Object.fromEntries(
+                metrics.map(m => [m.key, Math.max(...stats.map(s => Number(s[m.key] || 0))) || 1])
+                );
+
+                // 3) Render the stat bars
+                wrap.innerHTML = `
+                <h5 class="mb-3">Driver Comparison — ${season} Season</h5>
+                <div class="comparison-bars">
+                    ${stats.map((s, idx) => `
+                    <div class="stat-card">
+                        <div class="driver-header">
+                        <span>${s.driver?.name || 'Unknown Driver'}</span>
+                        </div>
+                        ${metrics.map(m => {
+                        const raw = Number(s[m.key] ?? 0);
+                        const w = Math.round((raw / (maxByKey[m.key] || 1)) * 100);
+                        const valueCell = m.reliable || raw > 0 ? raw : 'N/A';
+                        const width = (m.reliable || raw > 0) ? `${w}%` : '0%';
+                        return `
+                        <div class="stat-row">
+                            <div class="stat-label">${m.label}</div>
+                            <div class="progress"><div class="progress-fill" style="width:${width}"></div></div>
+                            <div class="stat-value">${valueCell}</div>
+                        </div>`;
+                        }).join('')}
+                    </div>
+                    `).join('')}
+                </div>
+                <div class="text-center mt-3">
+                    <button class="btn btn-danger" id="clearComparison">Clear Comparison</button>
+                </div>
+                `;
+
+                document.getElementById('clearComparison')?.addEventListener('click', () => {
+                comparedDrivers = [];
+                updateComparisonResults(season);
+                });
+
+            } catch (err) {
+                console.error('Comparison error:', err);
+                wrap.innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-triangle-exclamation fa-2x mb-3"></i>
+                    <p>Couldn’t load comparison data. Please try another season or drivers.</p>
+                    <button class="btn btn-outline-light" onclick="updateComparisonResults('${season}')">
+                    Retry
+                    </button>
+                </div>`;
+            }
+        }
+
+        function showMockComparisonData(season, driverIds) {
+            const comparisonResults = document.getElementById('comparisonResults');
+            
+            // Mock data for demonstration
+            const mockDrivers = {
+                '1': { name: 'Max Verstappen', position: 1, points: 454, wins: 15, podiums: 17, poles: 7, fastestLaps: 5 },
+                '2': { name: 'Charles Leclerc', position: 2, points: 308, wins: 3, podiums: 11, poles: 9, fastestLaps: 3 },
+                '3': { name: 'Sergio Perez', position: 3, points: 305, wins: 2, podiums: 11, poles: 1, fastestLaps: 2 },
+                '4': { name: 'George Russell', position: 4, points: 275, wins: 1, podiums: 8, poles: 1, fastestLaps: 4 },
+                '5': { name: 'Carlos Sainz', position: 5, points: 246, wins: 1, podiums: 9, poles: 3, fastestLaps: 2 },
+                '6': { name: 'Lewis Hamilton', position: 6, points: 240, wins: 0, podiums: 9, poles: 0, fastestLaps: 2 },
+                '7': { name: 'Lando Norris', position: 7, points: 122, wins: 0, podiums: 1, poles: 0, fastestLaps: 1 },
+                '8': { name: 'Esteban Ocon', position: 8, points: 92, wins: 0, podiums: 0, poles: 0, fastestLaps: 0 },
+                '9': { name: 'Fernando Alonso', position: 9, points: 81, wins: 0, podiums: 0, poles: 0, fastestLaps: 0 },
+                '10': { name: 'Valtteri Bottas', position: 10, points: 49, wins: 0, podiums: 0, poles: 0, fastestLaps: 1 }
+            };
+            
+            const driversStats = driverIds.map(id => mockDrivers[id] || { 
+                name: 'Unknown Driver', 
+                position: 'N/A', 
+                points: 0, 
+                wins: 0, 
+                podiums: 0, 
+                poles: 0, 
+                fastestLaps: 0 
+            });
+            
+            comparisonResults.innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Showing demonstration data as API might be unavailable
+                </div>
+                <h5 class="mb-3">Driver Comparison - ${season} Season</h5>
+                <div class="radar-chart-container">
+                    <canvas id="comparisonRadarChart"></canvas>
+                </div>
+                <div class="table-responsive mt-4">
+                    <table class="table table-dark table-hover comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Driver</th>
+                                <th>Position</th>
+                                <th>Points</th>
+                                <th>Wins</th>
+                                <th>Podiums</th>
+                                <th>Poles</th>
+                                <th>Fastest Laps</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${driversStats.map(driver => `
+                                <tr>
+                                    <td><strong>${driver.name}</strong></td>
+                                    <td>${driver.position}</td>
+                                    <td>${driver.points}</td>
+                                    <td>${driver.wins}</td>
+                                    <td>${driver.podiums}</td>
+                                    <td>${driver.poles}</td>
+                                    <td>${driver.fastestLaps}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <button class="btn btn-danger" id="clearComparison">Clear Comparison</button>
+                </div>
+            `;
+            
+            // Create radar chart with mock data
+            setTimeout(() => {
+                createRadarChart(driversStats.map(driver => ({
+                    driver: { name: driver.name },
+                    points: driver.points,
+                    wins: driver.wins,
+                    podiums: driver.podiums,
+                    pole_positions: driver.poles,
+                    fastest_laps: driver.fastestLaps
+                })));
+            }, 100);
+            
+            // Add event listener to clear button
+            document.getElementById('clearComparison').addEventListener('click', () => {
+                comparedDrivers = [];
+                updateComparisonResults(season);
+            });
+        }
+
+        function updateCircuitsList(circuits) {
+            const circuitsList = document.getElementById('circuitsList');
+            if (!circuitsList) return;
+            
+            if (!circuits || circuits.length === 0) {
+                circuitsList.innerHTML = '<div class="col-12 text-center">No circuits data available</div>';
+                return;
+            }
+            
+            circuitsList.innerHTML = '';
+            circuits.forEach(circuit => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4 mb-4';
+                
+                const circuitImage = circuit.image ? 
+                    `<img src="${circuit.image}" alt="${circuit.name}" class="circuit-image" style="width: 100%; height: 100%; object-fit: cover;">` :
+                    `<div class="circuit-map">
+                        <i class="fas fa-map-marker-alt fa-2x"></i>
+                     </div>`;
+                
+                // Fix the location display - use circuit.location instead of circuit.competition.location
+                const location = circuit.location || (circuit.competition ? circuit.competition.name : 'Unknown Location');
+                
+                col.innerHTML = `
+                    <div class="card">
+                        <div class="circuit-map">
+                            ${circuitImage}
+                        </div>
+                        <div class="card-body text-center">
+                            <h5>${circuit.name}</h5>
+                            <p class="text-muted mb-0">${location}</p>
+                            ${circuit.country ? `<small class="text-muted">${circuit.country}</small>` : ''}
+                        </div>
+                    </div>
+                `;
+                circuitsList.appendChild(col);
+            });
+        }
+
+        function showLoading(elementId, message) {
+            if (elementId.includes('Table')) {
+                const tbody = document.querySelector(`#${elementId} tbody`);
+                if (tbody) tbody.innerHTML = `<tr><td colspan="10" class="text-center">${message}</td></tr>`;
+            } else {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.innerHTML = `<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-danger me-2"></div>${message}</div>`;
+                }
+            }
+        }
+
+        function showError(elementId, message) {
+            if (elementId.includes('Table')) {
+                const tbody = document.querySelector(`#${elementId} tbody`);
+                if (tbody) tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger">${message}</td></tr>`;
+            } else {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.innerHTML = `<p class="text-center text-danger">${message}</p>`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
