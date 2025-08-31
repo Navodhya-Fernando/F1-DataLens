@@ -185,13 +185,5 @@ const API_KEY = 'YOUR_RAPIDAPI_KEY'; // if you call RapidAPI directly (NOT recom
 
 ---
 
-## Roadmap
-- Add **CloudFront** in front of S3 for TLS + caching.
-- Precompute season aggregates in Lambda for faster first paint.
-- Add a **/health** route on Lambda for quick status checks.
-- Optional **map** for circuits with Leaflet + OSM.
-
----
-
 ## License
 MIT © 2025 Navodhya Fernando | Sandrea Raj | Hashini Handapangoda
