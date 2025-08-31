@@ -9,6 +9,8 @@ _Published as part of the Cloud Computing Module at Advanced Diploma in Data Sci
 
 > **F1 DataLens** is a lightweight analytics UI that calls the **API-SPORTS Formula-1** endpoints through an AWS **Lambda** function exposed by **API Gateway**, and renders standings, race info, driver comparisons, and circuit profiles. The site is hosted as a **static website on S3**.
 
+> **⚠️ Note:** This dashboard is currently optimized for desktop browsers and is not mobile-friendly.
+
 ---
 
 ## Table of Contents
@@ -192,4 +194,4 @@ const API_KEY = 'YOUR_RAPIDAPI_KEY'; // if you call RapidAPI directly (NOT recom
 ---
 
 ## License
-MIT © 2025 Navodhya Fernando | Sndrea Raj | Hashini Handapangoda
+MIT © 2025 Navodhya Fernando | Sandrea Raj | Hashini Handapangoda
