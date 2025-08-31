@@ -1,5 +1,6 @@
 # F1 DataLens 🏎️  
-_Serverless Formula 1 analytics dashboard on **AWS S3 + API Gateway + Lambda** (frontend-only hosting, backend via REST)_
+_Serverless Formula 1 analytics dashboard on **AWS S3 + API Gateway + Lambda** (frontend-only hosting, backend via HTTP)_
+_Published as part of the Cloud Computing Module at Advanced Diploma in Data Science offered by National Innovation Centre - NIBM in collaboration with Coventry University_
 
 ![Static Site](https://img.shields.io/badge/Hosting-AWS%20S3-orange)
 ![API](https://img.shields.io/badge/API-API%20Gateway%20%2B%20Lambda-red)
