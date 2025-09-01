@@ -2,6 +2,7 @@ import http.client
 import json
 import os
 import logging
+import urllib.parse
 
 # Set up logging
 logger = logging.getLogger()
@@ -31,7 +32,7 @@ def lambda_handler(event, context):
             }
         
         # Get the exact path and query string from the API Gateway request
-        full_path = event.get('rawPath', '')
+        raw_path = event.get('rawPath', '')
         query_string = event.get('rawQueryString', '')
         
         # Get API key from environment variable
@@ -57,10 +58,15 @@ def lambda_handler(event, context):
             'x-rapidapi-key': api_key
         }
         
-        # Build the full path for the external API call
-        api_path = full_path
+        # Build the path for the external API call
+        # Remove any potential stage prefix from the path
+        api_path = raw_path
+        if api_path.startswith('/default/'):
+            api_path = api_path.replace('/default/', '/', 1)
+        
+        # Add query string if present
         if query_string:
-            api_path = f"{full_path}?{query_string}"
+            api_path = f"{api_path}?{query_string}"
         
         logger.info(f"Making request to external API: {api_path}")
 
@@ -98,10 +104,7 @@ def lambda_handler(event, context):
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 'Access-Control-Allow-Methods': 'GET,OPTIONS'
             },
-            'body': json.dumps({
-                'status': 'success',
-                'data': json_response
-            })
+            'body': response_body  # Return the original response body
         }
         
     except Exception as e:

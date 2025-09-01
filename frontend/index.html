@@ -741,8 +741,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // API Configuration
-        const API_BASE_URL = 'https://v1.formula-1.api-sports.io';
-        const API_KEY = '6f8a87b310cb1bd62e29cfd92b333a2f';
+        const API_BASE_URL = 'https://0uw847ge05.execute-api.ap-south-1.amazonaws.com';
         
         let currentSeason = new Date().getFullYear();
         let allSeasons = [];
@@ -1042,18 +1041,23 @@
 
         async function fetchAPI(endpoint) {
             const url = `${API_BASE_URL}${endpoint}`;
-            const response = await fetch(url, {
-                headers: {
-                    'x-rapidapi-host': 'v1.formula-1.api-sports.io',
-                    'x-rapidapi-key': API_KEY
+            console.log('Fetching:', url);
+            
+            try {
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${endpoint}: ${response.status}`);
                 }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to fetch ${endpoint}: ${response.status}`);
+                
+                // Parse the response directly (not wrapped in a "data" property)
+                const data = await response.json();
+                console.log('API Response:', data);
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error; // Re-throw the error to be handled by calling functions
             }
-            
-            return await response.json();
         }
 
         const driverSeasonCache = new Map();
