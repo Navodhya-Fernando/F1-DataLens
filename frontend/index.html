@@ -447,6 +447,184 @@
             flex-direction: column;
         }
 
+        /* New styles for enhanced tabs */
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+        }
+        
+        .circuit-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .circuit-stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .circuit-stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--f1-red);
+            margin-bottom: 5px;
+        }
+        
+        .circuit-stat-label {
+            font-size: 0.85rem;
+            color: var(--f1-text-muted);
+        }
+        
+        .circuit-layout {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--f1-light) 0%, var(--card-bg) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .circuit-layout img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .winner-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .winner-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .winner-item:last-child {
+            border-bottom: none;
+        }
+        
+        .winner-position {
+            width: 30px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--f1-red);
+        }
+        
+        .winner-name {
+            flex: 1;
+            margin: 0 12px;
+        }
+        
+        .winner-times {
+            font-size: 0.9rem;
+            color: var(--f1-text-muted);
+        }
+        
+        .tab-subnav {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-subnav .nav-link {
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 0 5px;
+        }
+        
+        .performance-chart {
+            height: 250px;
+            margin: 15px 0;
+        }
+        
+        .team-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .team-comparison-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .team-comparison-name {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            color: var(--f1-text-muted);
+        }
+        
+        .team-comparison-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--f1-red);
+        }
+        
+        .lap-time-chart {
+            height: 200px;
+            margin: 15px 0;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-radius: 0.75rem;
+        }
+        
+        .data-cache-notice {
+            font-size: 0.8rem;
+            color: var(--f1-text-muted);
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stats-grid-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stats-grid-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--f1-red);
+            margin-bottom: 5px;
+        }
+        
+        .stats-grid-label {
+            font-size: 0.85rem;
+            color: var(--f1-text-muted);
+        }
     </style>
 </head>
 <body>
@@ -622,25 +800,124 @@
         <!-- Season Analysis Tab -->
         <div id="seasonTab" class="tab-content">
             <h3 class="mb-4">Season Analysis - <span class="text-danger" id="seasonAnalysisTitle">2022</span></h3>
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">Race Calendar</div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-dark table-hover" id="raceCalendarTable">
-                                    <thead><tr><th>Race</th><th>Circuit</th><th>Date</th><th>Type</th><th>Status</th></tr></thead>
-                                    <tbody><tr><td colspan="6" class="text-center">Loading race calendar...</td></tr></tbody>
-                                </table>
+            
+            <div class="tab-subnav">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-season-view="calendar">Race Calendar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-season-view="championship">Championship Progress</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-season-view="team-performance">Team Performance</a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div id="seasonCalendarView">
+
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">Season Statistics</div>
+                            <div class="card-body" id="seasonStats">
+                                <div class="text-center py-4"><div class="spinner-border text-danger"></div><p class="mt-2 mb-0">Loading statistics...</p></div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">Season Statistics</div>
-                        <div class="card-body" id="seasonStats">
-                            <div class="text-center py-4"><div class="spinner-border text-danger"></div><p class="mt-2 mb-0">Loading statistics...</p></div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">Race Calendar</div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-hover" id="raceCalendarTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Round</th>
+                                                <th>Race Name</th>
+                                                <th>Circuit</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="5" class="text-center">Loading race calendar...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="seasonChampionshipView" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">Podium Distribution</div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="podiumDistributionChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">Points Comparison</div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="pointsComparisonChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">Season Highlights</div>
+                            <div class="card-body">
+                                <div class="row" id="seasonHighlights">
+                                    <div class="col-md-12 text-center py-4">
+                                        <div class="spinner-border text-danger"></div>
+                                        <p class="mt-2 mb-0">Loading season highlights...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="seasonTeamPerformanceView" style="display: none;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">Team Comparison</div>
+                            <div class="card-body">
+                                <div class="team-comparison" id="teamComparison">
+                                    <!-- Team comparison items will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">Team Performance Overview</div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="teamPerformanceChart"></canvas>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -683,15 +960,90 @@
         <!-- Circuit Profiler Tab -->
         <div id="circuitsTab" class="tab-content">
             <h3 class="mb-4">Circuit Profiler - <span class="text-danger" id="circuitsSeasonTitle">2022</span></h3>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">F1 Circuits</div>
-                        <div class="card-body">
-                            <div class="row" id="circuitsList">
-                                <div class="col-md-12 text-center py-4">
-                                    <div class="spinner-border text-danger"></div>
-                                    <p class="mt-2 mb-0">Loading circuits...</p>
+            
+            <div class="tab-subnav">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-circuit-view="overview">Circuit Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-circuit-view="performance">Performance Stats</a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div id="circuitOverviewView">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">F1 Circuits</div>
+                            <div class="card-body">
+                                <div class="row" id="circuitsList">
+                                    <div class="col-md-12 text-center py-4">
+                                        <div class="spinner-border text-danger"></div>
+                                        <p class="mt-2 mb-0">Loading circuits...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="circuitPerformanceView" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">Select Circuit</div>
+                            <div class="card-body">
+                                <select class="form-select mb-3" id="circuitSelector">
+                                    <option value="">Loading circuits...</option>
+                                </select>
+                                <div id="circuitBasicInfo" class="text-center">
+                                    <p class="text-muted">Select a circuit to view details</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header">Circuit Characteristics</div>
+                            <div class="card-body">
+                                <div class="row" id="circuitStats">
+                                    <div class="col-md-6">
+                                        <div class="circuit-stat">
+                                            <div class="circuit-stat-value" id="circuitLength">-</div>
+                                            <div class="circuit-stat-label">Length (km)</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="circuit-stat">
+                                            <div class="circuit-stat-value" id="circuitLaps">-</div>
+                                            <div class="circuit-stat-label">Laps</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="circuit-stat">
+                                            <div class="circuit-stat-value" id="circuitTurns">-</div>
+                                            <div class="circuit-stat-label">Turns</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="circuit-stat">
+                                            <div class="circuit-stat-value" id="circuitDRS">-</div>
+                                            <div class="circuit-stat-label">DRS Zones</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">Circuit Layout</div>
+                            <div class="card-body">
+                                <div class="circuit-layout" id="circuitImageContainer">
+                                    <p class="text-muted">Select a circuit to view layout</p>
                                 </div>
                             </div>
                         </div>
@@ -750,7 +1102,14 @@
         let allTeams = [];
         let allCircuits = [];
         let comparedDrivers = [];
-        let radarChart = null;
+        let podiumDistributionChart = null;
+        let pointsComparisonChart = null;
+        let teamPerformanceChart = null;
+        let circuitPerformanceChart = null;
+
+        // Data caches
+        const championshipDataCache = new Map();
+        const circuitDataCache = new Map();
 
         // Team logos mapping
         const teamLogos = {
@@ -771,7 +1130,60 @@
             setupTabHandling();
             setupSettingsToggle();
             setupThemeToggle();
+            setupSeasonSubTabs();
+            setupCircuitSubTabs();
         });
+
+        function setupSeasonSubTabs() {
+            document.querySelectorAll('[data-season-view]').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const view = this.getAttribute('data-season-view');
+                    
+                    // Update active tab
+                    document.querySelectorAll('[data-season-view]').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Show appropriate view
+                    document.getElementById('seasonCalendarView').style.display = view === 'calendar' ? 'block' : 'none';
+                    document.getElementById('seasonChampionshipView').style.display = view === 'championship' ? 'block' : 'none';
+                    document.getElementById('seasonTeamPerformanceView').style.display = view === 'team-performance' ? 'block' : 'none';
+                    
+                    // Load data for the view if needed
+                    if (view === 'championship') {
+                        loadChampionshipData(currentSeason);
+                    } else if (view === 'team-performance') {
+                        loadTeamPerformanceComparison(currentSeason);
+                    }
+                });
+            });
+        }
+
+        function setupCircuitSubTabs() {
+            document.querySelectorAll('[data-circuit-view]').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const view = this.getAttribute('data-circuit-view');
+                    
+                    // Update active tab
+                    document.querySelectorAll('[data-circuit-view]').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Show appropriate view
+                    document.getElementById('circuitOverviewView').style.display = view === 'overview' ? 'block' : 'none';
+                    document.getElementById('circuitPerformanceView').style.display = view === 'performance' ? 'block' : 'none';
+                    
+                    // Initialize selectors if needed
+                    if (view === 'performance') {
+                        loadCircuitData();
+                    }
+                });
+            });
+        }
 
         function setupSettingsToggle() {
             const themeToggle = document.getElementById('themeToggle');
@@ -975,6 +1387,270 @@
             }
         }
 
+        async function loadChampionshipData(season) {
+            try {
+                // Get driver standings for the season
+                const driversData = await fetchAPI(`/rankings/drivers?season=${season}`);
+                const drivers = driversData.response || [];
+                
+                // Create simplified visualizations using the data we know works
+                createPodiumDistributionChart(drivers);
+                createPointsComparisonChart(drivers);
+                updateSeasonHighlights(drivers);
+                
+            } catch (error) {
+                console.error('Error loading championship data:', error);
+                showError('seasonHighlights', 'Failed to load championship data');
+            }
+        }
+
+        function createPodiumDistributionChart(drivers) {
+            const ctx = document.getElementById('podiumDistributionChart');
+            if (!ctx) return;
+            
+            if (podiumDistributionChart) {
+                podiumDistributionChart.destroy();
+            }
+            
+            // Get top 5 drivers for the chart
+            const topDrivers = drivers.slice(0, 5);
+            
+            podiumDistributionChart = new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: topDrivers.map(driver => driver.driver.name),
+                    datasets: [{
+                        label: 'Podiums',
+                        data: topDrivers.map(driver => driver.wins || 0),
+                        backgroundColor: '#e10600',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Race Wins This Season',
+                            color: '#e0e0e0'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0e0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#e0e0e0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createPointsComparisonChart(drivers) {
+            const ctx = document.getElementById('pointsComparisonChart');
+            if (!ctx) return;
+            
+            if (pointsComparisonChart) {
+                pointsComparisonChart.destroy();
+            }
+            
+            // Get top 5 drivers for the chart
+            const topDrivers = drivers.slice(0, 5);
+            
+            pointsComparisonChart = new Chart(ctx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: topDrivers.map(driver => driver.driver.name),
+                    datasets: [{
+                        data: topDrivers.map(driver => driver.points || 0),
+                        backgroundColor: [
+                            '#e10600',
+                            '#0600EF',
+                            '#00D2BE',
+                            '#FF8700',
+                            '#0090FF'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#e0e0e0'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Points Distribution',
+                            color: '#e0e0e0'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateSeasonHighlights(drivers) {
+            const highlightsContainer = document.getElementById('seasonHighlights');
+            if (!highlightsContainer) return;
+            
+            if (!drivers || drivers.length === 0) {
+                highlightsContainer.innerHTML = '<div class="col-12 text-center">No driver data available</div>';
+                return;
+            }
+            
+            const topDriver = drivers[0];
+            
+            highlightsContainer.innerHTML = `
+                <div class="col-md-4 text-center">
+                    <div class="circuit-stat">
+                        <div class="circuit-stat-value">${topDriver.driver.name.split(' ')[0]}</div>
+                        <div class="circuit-stat-label">Leading Driver</div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="circuit-stat">
+                        <div class="circuit-stat-value">${topDriver.points || 0}</div>
+                        <div class="circuit-stat-label">Points</div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="circuit-stat">
+                        <div class="circuit-stat-value">${topDriver.wins || 0}</div>
+                        <div class="circuit-stat-label">Wins</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadTeamPerformanceComparison(season) {
+            try {
+                showLoading('teamComparison', 'Loading team performance data...');
+                
+                // Get team standings
+                const teamsData = await fetchAPI(`/rankings/teams?season=${season}`);
+                const teams = teamsData.response || [];
+                
+                // Update team comparison
+                updateTeamComparison(teams);
+                
+                // Create team performance chart
+                createTeamPerformanceChart(teams);
+                
+            } catch (error) {
+                console.error('Error loading team performance comparison:', error);
+                showError('teamComparison', 'Failed to load team performance data');
+            }
+        }
+
+        function updateTeamComparison(teams) {
+            const teamComparison = document.getElementById('teamComparison');
+            if (!teamComparison) return;
+            
+            if (!teams || teams.length === 0) {
+                teamComparison.innerHTML = '<div class="col-12 text-center">No team data available</div>';
+                return;
+            }
+            
+            teamComparison.innerHTML = '';
+            
+            teams.slice(0, 6).forEach(team => {
+                const item = document.createElement('div');
+                item.className = 'team-comparison-item';
+                
+                item.innerHTML = `
+                    <div class="team-comparison-name">${team.team.name}</div>
+                    <div class="team-comparison-value">${team.points || 0}</div>
+                    <div class="text-muted">Points</div>
+                `;
+                
+                teamComparison.appendChild(item);
+            });
+        }
+
+        function createTeamPerformanceChart(teams) {
+            const ctx = document.getElementById('teamPerformanceChart');
+            if (!ctx) return;
+            
+            if (teamPerformanceChart) {
+                teamPerformanceChart.destroy();
+            }
+            
+            // Get top teams for the chart
+            const topTeams = teams.slice(0, 5);
+            
+            teamPerformanceChart = new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: topTeams.map(team => team.team.name),
+                    datasets: [{
+                        label: 'Points',
+                        data: topTeams.map(team => team.points || 0),
+                        backgroundColor: [
+                            '#00D2BE',
+                            '#0600EF',
+                            '#DC0000',
+                            '#FF8700',
+                            '#0090FF'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Team Performance Comparison',
+                            color: '#e0e0e0'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0e0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#e0e0e0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         async function loadDriverComparison(season) {
             try {
                 showLoading('driversList', 'Loading drivers...');
@@ -1039,71 +1715,65 @@
             }
         }
 
-        async function fetchAPI(endpoint) {
-            const url = `${API_BASE_URL}${endpoint}`;
-            console.log('Fetching:', url);
-            
+        async function loadCircuitData() {
             try {
-                const response = await fetch(url);
+                // Get all circuits
+                const circuitsData = await fetchAPI('/circuits');
+                allCircuits = circuitsData.response || [];
                 
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch ${endpoint}: ${response.status}`);
+                // Populate circuit selector
+                const circuitSelector = document.getElementById('circuitSelector');
+                if (circuitSelector && allCircuits.length > 0) {
+                    circuitSelector.innerHTML = '<option value="">Select a circuit</option>';
+                    allCircuits.forEach(circuit => {
+                        const option = document.createElement('option');
+                        option.value = circuit.id;
+                        option.textContent = circuit.name;
+                        circuitSelector.appendChild(option);
+                    });
+                    
+                    // Add event listener
+                    circuitSelector.addEventListener('change', function() {
+                        const circuitId = this.value;
+                        if (circuitId) {
+                            updateCircuitDetails(circuitId);
+                        }
+                    });
                 }
-                
-                // Parse the response directly (not wrapped in a "data" property)
-                const data = await response.json();
-                console.log('API Response:', data);
-                return data;
             } catch (error) {
-                console.error('API Error:', error);
-                throw error; // Re-throw the error to be handled by calling functions
+                console.error('Error loading circuit data:', error);
             }
         }
 
-        const driverSeasonCache = new Map();
-
-        async function getDriverSeasonStats(season, driverId) {
-            const key = `${season}-${driverId}`;
-            if (driverSeasonCache.has(key)) return driverSeasonCache.get(key);
-
-            // 1) base driver standings for points & wins (and driver info)
-            const base = await fetchAPI(`/rankings/drivers?season=${season}&driver=${driverId}`);
-            const baseItem = (base.response || [])[0] || {};
-            const out = {
-                driver: baseItem.driver || { name: 'Unknown Driver' },
-                points: Number(baseItem.points || 0),
-                wins: Number(baseItem.wins || 0),
-                podiums: 0,
-                pole_positions: 0,
-                fastest_laps: 0
-            };
-
-            // 2) podiums from race rankings
-            try {
-                const rr = await fetchAPI(`/rankings/races?season=${season}&driver=${driverId}`);
-                const races = rr.response || [];
-                out.podiums = races.filter(r =>
-                (r.type || '').toLowerCase().includes('race') &&
-                Number(r.position || 99) <= 3
-                ).length;
-            } catch (e) { /* keep 0 */ }
-
-            // 3) poles from starting grid
-            try {
-                const sg = await fetchAPI(`/rankings/startinggrid?season=${season}&driver=${driverId}`);
-                const starts = sg.response || [];
-                out.pole_positions = starts.filter(s => Number(s.position || 99) === 1).length;
-            } catch (e) { /* keep 0 */ }
-
-            // 4) fastest laps
-            try {
-                const fl = await fetchAPI(`/rankings/fastestlaps?season=${season}&driver=${driverId}`);
-                out.fastest_laps = (fl.response || []).length;
-            } catch (e) { /* keep 0 */ }
-
-            driverSeasonCache.set(key, out);
-            return out;
+        function updateCircuitDetails(circuitId) {
+            const circuit = allCircuits.find(c => c.id == circuitId);
+            if (!circuit) return;
+            
+            // Update basic info
+            const circuitBasicInfo = document.getElementById('circuitBasicInfo');
+            if (circuitBasicInfo) {
+                circuitBasicInfo.innerHTML = `
+                    <h5>${circuit.name}</h5>
+                    <p class="text-muted">${circuit.country || ''}</p>
+                `;
             }
+            
+            // Update circuit image
+            const circuitImageContainer = document.getElementById('circuitImageContainer');
+            if (circuitImageContainer) {
+                if (circuit.image) {
+                    circuitImageContainer.innerHTML = `<img src="${circuit.image}" alt="${circuit.name}" style="max-width: 100%; max-height: 100%;">`;
+                } else {
+                    circuitImageContainer.innerHTML = '<div class="text-center"><i class="fas fa-map-marker-alt fa-3x text-muted"></i><p class="mt-2">No image available</p></div>';
+                }
+            }
+            
+            // Update circuit stats with mock data
+            document.getElementById('circuitLength').textContent = circuit.length || '5.4';
+            document.getElementById('circuitLaps').textContent = '58';
+            document.getElementById('circuitTurns').textContent = circuit.turns || '16';
+            document.getElementById('circuitDRS').textContent = circuit.drs_zones || '2';
+        }
 
         function updateDriverStandings(drivers) {
             const tbody = document.querySelector('#driverStandingsTable tbody');
@@ -1241,23 +1911,28 @@
             if (!tbody) return;
             
             if (!races || races.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No race data available</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">No race data available</td></tr>';
                 return;
             }
             
             tbody.innerHTML = '';
-            races.forEach(race => {
+            
+            // Sort races by date
+            const sortedRaces = races.filter(race => race.date).sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            for (const race of sortedRaces) {
                 const date = new Date(race.date).toLocaleDateString();
                 const row = document.createElement('tr');
+                
                 row.innerHTML = `
+                    <td><span class="badge ${getRaceTypeBadgeClass(race.type)}">${race.type || 'Unknown'}</span></td>
                     <td><strong>${race.competition ? race.competition.name : race.name || 'Unknown'}</strong></td>
                     <td>${race.circuit ? race.circuit.name : 'Unknown'}</td>
                     <td>${date}</td>
-                    <td><span class="badge ${getRaceTypeBadgeClass(race.type)}">${race.type || 'Unknown'}</span></td>
                     <td><span class="badge ${new Date(race.date) < new Date() ? 'bg-success' : 'bg-warning'}">${new Date(race.date) < new Date() ? 'Completed' : 'Upcoming'}</span></td>
                 `;
                 tbody.appendChild(row);
-            });
+            }
         }
 
         function updateSeasonStats(races) {
@@ -1266,12 +1941,27 @@
             
             const completedRaces = races.filter(race => new Date(race.date) < new Date()).length;
             const totalRaces = races.length;
+            const upcomingRaces = totalRaces - completedRaces;
             
             seasonStats.innerHTML = `
-                <div class="text-center">
-                    <div class="stats-number">${completedRaces}/${totalRaces}</div>
-                    <div class="text-muted">Races Completed</div>
+                <div class="d-flex justify-content-between mb-3">
+                    <div class="text-center">
+                        <div class="stats-number">${totalRaces}</div>
+                        <div class="text-muted">Total Races</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-number">${completedRaces}</div>
+                        <div class="text-muted">Completed</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-number">${upcomingRaces}</div>
+                        <div class="text-muted">Upcoming</div>
+                    </div>
                 </div>
+                <div class="progress mb-3" style="height: 10px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: ${(completedRaces/totalRaces)*100}%" aria-valuenow="${completedRaces}" aria-valuemin="0" aria-valuemax="${totalRaces}"></div>
+                </div>
+                <small class="text-muted">Season Progress</small>
             `;
         }
 
@@ -1285,7 +1975,8 @@
             }
             
             driversList.innerHTML = '';
-            drivers.slice(0, 12).forEach(driver => {
+            
+            drivers.forEach(driver => {
                 const col = document.createElement('div');
                 col.className = 'col-md-3 mb-3';
                 
@@ -1293,7 +1984,7 @@
                     `<img src="${driver.image}" alt="${driver.name}" class="driver-image" style="height: 120px; object-fit: cover;">` :
                     `<div class="driver-image d-flex align-items-center justify-content-center" style="height: 120px;">
                         <i class="fas fa-user fa-3x text-muted"></i>
-                     </div>`;
+                    </div>`;
                 
                 col.innerHTML = `
                     <div class="card driver-card text-center p-3 position-relative" data-driver-id="${driver.id}" style="cursor: pointer;">
@@ -1376,7 +2067,7 @@
                 comparedDrivers.map(id => getDriverSeasonStats(season, id))
                 );
 
-                // 2) pick the metrics we’ll show. Points & podiums are reliable.
+                // 2) pick the metrics we'll show. Points & podiums are reliable.
                 const metrics = [
                 { key: 'points',        label: 'Points',        reliable: true  },
                 { key: 'wins',          label: 'Wins',          reliable: true  },
@@ -1426,7 +2117,7 @@
                 wrap.innerHTML = `
                 <div class="text-center py-5 text-muted">
                     <i class="fas fa-triangle-exclamation fa-2x mb-3"></i>
-                    <p>Couldn’t load comparison data. Please try another season or drivers.</p>
+                    <p>Couldn't load comparison data. Please try another season or drivers.</p>
                     <button class="btn btn-outline-light" onclick="updateComparisonResults('${season}')">
                     Retry
                     </button>
@@ -1434,93 +2125,50 @@
             }
         }
 
-        function showMockComparisonData(season, driverIds) {
-            const comparisonResults = document.getElementById('comparisonResults');
-            
-            // Mock data for demonstration
-            const mockDrivers = {
-                '1': { name: 'Max Verstappen', position: 1, points: 454, wins: 15, podiums: 17, poles: 7, fastestLaps: 5 },
-                '2': { name: 'Charles Leclerc', position: 2, points: 308, wins: 3, podiums: 11, poles: 9, fastestLaps: 3 },
-                '3': { name: 'Sergio Perez', position: 3, points: 305, wins: 2, podiums: 11, poles: 1, fastestLaps: 2 },
-                '4': { name: 'George Russell', position: 4, points: 275, wins: 1, podiums: 8, poles: 1, fastestLaps: 4 },
-                '5': { name: 'Carlos Sainz', position: 5, points: 246, wins: 1, podiums: 9, poles: 3, fastestLaps: 2 },
-                '6': { name: 'Lewis Hamilton', position: 6, points: 240, wins: 0, podiums: 9, poles: 0, fastestLaps: 2 },
-                '7': { name: 'Lando Norris', position: 7, points: 122, wins: 0, podiums: 1, poles: 0, fastestLaps: 1 },
-                '8': { name: 'Esteban Ocon', position: 8, points: 92, wins: 0, podiums: 0, poles: 0, fastestLaps: 0 },
-                '9': { name: 'Fernando Alonso', position: 9, points: 81, wins: 0, podiums: 0, poles: 0, fastestLaps: 0 },
-                '10': { name: 'Valtteri Bottas', position: 10, points: 49, wins: 0, podiums: 0, poles: 0, fastestLaps: 1 }
+        const driverSeasonCache = new Map();
+
+        async function getDriverSeasonStats(season, driverId) {
+            const key = `${season}-${driverId}`;
+            if (driverSeasonCache.has(key)) return driverSeasonCache.get(key);
+
+            // 1) base driver standings for points & wins (and driver info)
+            const base = await fetchAPI(`/rankings/drivers?season=${season}&driver=${driverId}`);
+            const baseItem = (base.response || [])[0] || {};
+            const out = {
+                driver: baseItem.driver || { name: 'Unknown Driver' },
+                points: Number(baseItem.points || 0),
+                wins: Number(baseItem.wins || 0),
+                podiums: 0,
+                pole_positions: 0,
+                fastest_laps: 0
             };
-            
-            const driversStats = driverIds.map(id => mockDrivers[id] || { 
-                name: 'Unknown Driver', 
-                position: 'N/A', 
-                points: 0, 
-                wins: 0, 
-                podiums: 0, 
-                poles: 0, 
-                fastestLaps: 0 
-            });
-            
-            comparisonResults.innerHTML = `
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Showing demonstration data as API might be unavailable
-                </div>
-                <h5 class="mb-3">Driver Comparison - ${season} Season</h5>
-                <div class="radar-chart-container">
-                    <canvas id="comparisonRadarChart"></canvas>
-                </div>
-                <div class="table-responsive mt-4">
-                    <table class="table table-dark table-hover comparison-table">
-                        <thead>
-                            <tr>
-                                <th>Driver</th>
-                                <th>Position</th>
-                                <th>Points</th>
-                                <th>Wins</th>
-                                <th>Podiums</th>
-                                <th>Poles</th>
-                                <th>Fastest Laps</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${driversStats.map(driver => `
-                                <tr>
-                                    <td><strong>${driver.name}</strong></td>
-                                    <td>${driver.position}</td>
-                                    <td>${driver.points}</td>
-                                    <td>${driver.wins}</td>
-                                    <td>${driver.podiums}</td>
-                                    <td>${driver.poles}</td>
-                                    <td>${driver.fastestLaps}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="text-center mt-3">
-                    <button class="btn btn-danger" id="clearComparison">Clear Comparison</button>
-                </div>
-            `;
-            
-            // Create radar chart with mock data
-            setTimeout(() => {
-                createRadarChart(driversStats.map(driver => ({
-                    driver: { name: driver.name },
-                    points: driver.points,
-                    wins: driver.wins,
-                    podiums: driver.podiums,
-                    pole_positions: driver.poles,
-                    fastest_laps: driver.fastestLaps
-                })));
-            }, 100);
-            
-            // Add event listener to clear button
-            document.getElementById('clearComparison').addEventListener('click', () => {
-                comparedDrivers = [];
-                updateComparisonResults(season);
-            });
-        }
+
+            // 2) podiums from race rankings
+            try {
+                const rr = await fetchAPI(`/rankings/races?season=${season}&driver=${driverId}`);
+                const races = rr.response || [];
+                out.podiums = races.filter(r =>
+                (r.type || '').toLowerCase().includes('race') &&
+                Number(r.position || 99) <= 3
+                ).length;
+            } catch (e) { /* keep 0 */ }
+
+            // 3) poles from starting grid
+            try {
+                const sg = await fetchAPI(`/rankings/startinggrid?season=${season}&driver=${driverId}`);
+                const starts = sg.response || [];
+                out.pole_positions = starts.filter(s => Number(s.position || 99) === 1).length;
+            } catch (e) { /* keep 0 */ }
+
+            // 4) fastest laps
+            try {
+                const fl = await fetchAPI(`/rankings/fastestlaps?season=${season}&driver=${driverId}`);
+                out.fastest_laps = (fl.response || []).length;
+            } catch (e) { /* keep 0 */ }
+
+            driverSeasonCache.set(key, out);
+            return out;
+            }
 
         function updateCircuitsList(circuits) {
             const circuitsList = document.getElementById('circuitsList');
@@ -1554,11 +2202,45 @@
                             <h5>${circuit.name}</h5>
                             <p class="text-muted mb-0">${location}</p>
                             ${circuit.country ? `<small class="text-muted">${circuit.country}</small>` : ''}
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-outline-danger view-circuit-details" data-circuit-id="${circuit.id}">
+                                    <i class="fas fa-chart-line me-1"></i> View Details
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
                 circuitsList.appendChild(col);
             });
+            
+            // Add event listeners to view details buttons
+            document.querySelectorAll('.view-circuit-details').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const circuitId = this.getAttribute('data-circuit-id');
+                    // Switch to performance tab and select this circuit
+                    document.querySelector('[data-circuit-view="performance"]').click();
+                    document.getElementById('circuitSelector').value = circuitId;
+                    document.getElementById('circuitSelector').dispatchEvent(new Event('change'));
+                });
+            });
+        }
+
+        async function fetchAPI(endpoint) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            
+            try {
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${endpoint}: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
         }
 
         function showLoading(elementId, message) {

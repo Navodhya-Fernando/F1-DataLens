@@ -1,0 +1,38 @@
+API Key : 6f8a87b310cb1bd62e29cfd92b333a2f
+
+x-rapidapi-host: v1.formula-1.api-sports.io
+
+Endpoints are as follows (Method = GET)
+
+Timezones : https://v1.formula-1.api-sports.io/timezone
+
+Seasons : https://v1.formula-1.api-sports.io/seasons
+
+Competitions : https://v1.formula-1.api-sports.io/competitions (id, name, country, city, search)
+
+Circuits : https://v1.formula-1.api-sports.io/circuits (id, competition(competition id), name, search)
+
+Teams : https://v1.formula-1.api-sports.io/teams (id, name, search)
+
+Drivers: https://v1.formula-1.api-sports.io/drivers (id, name, search)
+
+Races : https://v1.formula-1.api-sports.io/races [This endpoint requires at least one of these parameters id, date, next, last and season, All the parameters of this endpoint can be used together] (id, date, next, last, competition (competition id), circuit (circuit id), season, type, timezone) Available Status : Live, Completed, Cancelled, Postponed, Scheduled & Available Types: Race, 1st Qualifying, 2nd Qualifying, 3rd Qualifying, Sprint, 1st Sprint Shootout, 2nd Sprint Shootout, 3rd Sprint Shootout, 1st Practice, 2nd Practice, 3rd Practice
+
+Rankings : rankings/teams (season, team(team id)), rankings/drivers(season, driver(driver id), team(team id)), rankings/races(race(race id), team(team id), driver(driver id)), rankings/fastestlaps (same as rankings/races), rankings/startinggrid (same as rankings/races)
+
+Example Usage : 
+conn = http.client.HTTPSConnection("v1.formula-1.api-sports.io")
+
+headers = {
+    'x-rapidapi-host': "v1.formula-1.api-sports.io",
+    'x-rapidapi-key': "XxXxXxXxXxXxXxXxXxXxXxXx"
+    }
+
+conn.request("GET", "/rankings/teams?season=2019", headers=headers)
+
+res = conn.getresponse()
+data = res.read()
+
+print(data.decode("utf-8"))
+
+pitstops : https://v1.formula-1.api-sports.io/pitstops (race (race id), team (team id), driver (driver id))
