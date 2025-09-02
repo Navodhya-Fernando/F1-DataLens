@@ -32,16 +32,15 @@ _Published as part of the Cloud Computing Module at Advanced Diploma in Data Sci
 ---
 
 ## Live Demo
-- **S3 website endpoint** (static frontend): http://f1-data-labs.s3-website.ap-south-1.amazonaws.com/
-- **API Gateway** (backend Lambda endpoint): http://f1-data-labs.s3-website.ap-south-1.amazonaws.com/{proxy+}
+- https://dt027sludf8mz.cloudfront.net/
 
 ---
 
 ## Features
 - **Overview**: season KPIs (races, drivers, teams, points sum), latest & next race cards.
-- **Season Analysis**: race calendar table, season stats.
+- **Season Analysis**: race calendar table, Podium Comparison by Drivers & Point comaprision by Constructors
 - **Driver Comparison**: pick up to 2 drivers and compare key stats with clean progress bars.
-- **Circuit Profiler**: browse circuits used in the selected season.
+- **Circuit Profiler**: browse circuits used in the selected season and their statistics.
 - **Resilient UI**: guards against missing fields, graceful loading/error states.
 - **Dark/Light** theme toggle with persistence.
 
@@ -59,7 +58,7 @@ Browser (S3 static site: HTML/CSS/JS)
 
 - **Frontend**: single-page app (`frontend/index.html`) served from **S3 static website hosting**.
 - **Backend**: `backend/lambda_function.py` (Python) behind **API Gateway**. The Lambda injects API key headers and aggregates data when necessary.
-- **No servers to manage**; you can optionally add **CloudFront** CDN in front of S3 for HTTPS and caching.
+- **CloudFront**: For HTTPS and caching.
 
 ---
 
@@ -169,7 +168,7 @@ const API_KEY = 'YOUR_RAPIDAPI_KEY'; // if you call RapidAPI directly (NOT recom
 ---
 
 ## Monitoring
-- **CloudWatch Logs** for Lambda (errors, latency).
+- **CloudWatch Logs** for Lambda (errors, invocations, duration).
 - **API Gateway metrics** (4XX/5XX, latency).
 - **S3 access logs** (optional).
 
